@@ -21,6 +21,8 @@ describe Oystercard do
       expect(oystercard.max_balance).to eq Oystercard::MAX_BALANCE
     end
 
+    it {is_expected.to respond_to(:in_journey?)}
+
   end
 
   describe "#top_up" do
@@ -69,4 +71,48 @@ describe Oystercard do
 
     end
   end
+
+  describe "#touch in" do
+
+    it "touches in and changes status to in_journey" do
+      expect(oystercard.touch_in).to eq :in_journey
+    end
+
+    it "returns in_journey when touched in" do
+      oystercard.touch_in
+      expect(oystercard.status).to eq :in_journey
+    end
+
+  end
+
+  describe "#touch out" do
+
+    it "touches out and changes status to out_of_journey" do
+      expect(oystercard.touch_out).to eq :out_of_journey
+    end
+
+    it "returns out_of_journey when touched out" do
+      oystercard.touch_out
+      expect(oystercard.status).to eq :out_of_journey
+    end
+
+  end
+
+  describe "#in_journey?" do
+
+    before do
+      oystercard.touch_in
+    end
+
+    it "returns true when touched in" do
+      expect(oystercard.in_journey?).to be true
+    end
+
+    it "returns false when touched out" do
+      oystercard.touch_out
+      expect(oystercard.in_journey?).to be false
+    end
+
+  end
+
 end

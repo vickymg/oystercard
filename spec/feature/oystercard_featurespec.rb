@@ -13,4 +13,13 @@ describe 'feature_test' do
     amount = 91
     expect{card.top_up(amount)}.to raise_error("Exceeded max balance of #{Oystercard::MAX_BALANCE}!")
   end
+
+  it 'deducts money from oystercard' do
+    card = Oystercard.new
+    amount = 20
+    fare = 2
+    card.top_up(amount)
+    expect(card.deduct(fare)).to eq 18
+  end
+
 end
