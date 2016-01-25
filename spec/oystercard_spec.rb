@@ -1,8 +1,8 @@
 require 'oystercard'
 
+
 describe Oystercard do
 	let(:oystercard) { Oystercard.new }
-
 
 	it 'should have a balance of 0' do
 		expect(oystercard.balance).to eq(0)
@@ -18,6 +18,8 @@ describe Oystercard do
          #above could be written using .to change .by
    	end
 
-	end 
-
+		it "should have a maximum limit of #{Oystercard::MAXIMUM_LIMIT}" do
+			expect { oystercard.top_up(91) }.to raise_error "Cannot top up! Maximum limit #{Oystercard::MAXIMUM_LIMIT}!"
+		end
+	end
 end
