@@ -2,9 +2,10 @@ require 'oystercard'
 
 describe Oystercard do
   subject(:oystercard) {described_class.new}
-  let(:topup_amount) {20}
+  let(:topup_amount) {5}
   let(:random_topup_amount) {rand(1..20)}
   let(:too_large_topup) {91}
+  let(:set_fare) {2}
 
   describe "#initialize" do
 
@@ -44,4 +45,28 @@ describe Oystercard do
 
   end
 
+  describe "#deduct(fare)" do
+
+    it{is_expected.to respond_to(:deduct).with(1).argument}
+
+    before do
+      oystercard.top_up(topup_amount)
+    end
+
+    it "Will deduct the fare from the oystercard balance" do
+      expect(oystercard.deduct(set_fare)).to eq oystercard.balance
+    end
+
+    context "Cannot have a negative balance" do
+
+      before do
+        2.times {oystercard.deduct(set_fare)}
+      end
+
+      it "Will raise error 'Please top up your Oystercard'" do
+        expect{oystercard.deduct(set_fare)}.to raise_error "Please top up your Oystercard"
+      end
+
+    end
+  end
 end
