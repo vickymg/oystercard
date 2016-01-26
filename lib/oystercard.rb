@@ -5,7 +5,6 @@ class Oystercard
 
   MAXIMUM_BALANCE = 90
   MINIMUM_FARE = 1
-  # DEFAULT_OYSTER_HISTORY = Array.new
 
   def initialize
     @balance = 0
@@ -29,6 +28,8 @@ class Oystercard
     @exit_station = exit_station
     @entry_station = nil
     @record_journey[:exit] = exit_station
+    journey_history << record_journey
+    record_journey = {}
   end
 
   def in_journey?

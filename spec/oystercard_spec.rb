@@ -2,7 +2,7 @@ require 'oystercard'
 
 describe Oystercard do
 
-	let(:oystercard) { Oystercard.new }
+	subject(:oystercard) { Oystercard.new }
 
 	it 'should have a balance of 0' do
 		expect(oystercard.balance).to eq(0)
@@ -74,6 +74,9 @@ describe Oystercard do
 		end
 
 		describe '#journey_creation' do
+
+      let(:record_journey){ {entry: entry_station, exit: exit_station} }
+
 			it 'holds a journey log' do
 			  expect(oystercard.journey_history).to be_empty
 			end
