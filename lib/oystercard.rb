@@ -1,6 +1,12 @@
+require_relative 'station'
+
+STATION_LIST = [["Euston", "zone 1"], ["Angel", "zone 2"], ["Aldgate East", "zone 2"],
+["Cockfosters", "zone 4"], ["Piccadilly Circus", "zone 1"]]
+
 class Oystercard
 
   attr_reader :balance, :max_balance, :entry_station, :journey_list
+  attr_reader :station_list
 
   DEFAULT_BALANCE = 0
   MAX_BALANCE = 90
@@ -10,8 +16,8 @@ class Oystercard
     @balance = balance
     @entry_station = nil
     @journey_list = {}
+    @stations = structify(STATION_LIST)
   end
-
 
   def top_up(amount)
     fail "Exceeded max balance of #{MAX_BALANCE}!" if max_balance?(amount)
@@ -33,6 +39,11 @@ class Oystercard
     !!@entry_station
   end
 
+  def select_random_station
+    @stations[rand(0...@stations.length)]
+  end
+
+
 private
 
   def max_balance?(amount)
@@ -50,6 +61,12 @@ private
 
   def add_journey(station, exit_station)
     @journey_list[station] = exit_station
+  end
+
+  Station = Struct.new(:name, :zone)
+
+  def structify(stations)
+    stations.collect{ |pair| Station.new(pair[0], pair[1])}
   end
 
 end
