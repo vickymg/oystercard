@@ -42,4 +42,12 @@ describe 'feature_test' do
     oyster.touch_out
     expect(oyster.entry_station).to eq nil
   end
+
+  it 'remembers a list of journeys' do
+    card =  Oystercard.new(5)
+    card.touch_in("Station1")
+    card.touch_out('Station2')
+    expect(card.journey_list).to include("Station1").and include("Station2")
+  end
+
 end
