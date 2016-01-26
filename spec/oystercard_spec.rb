@@ -33,7 +33,34 @@ describe Oystercard do
 		it 'should deduct the balance' do
 			oystercard.deduct(10)
 			expect(oystercard.balance).to eq(-10)
+			#above could be written using .to change .by
 		end 
 	end 
+
+	describe 'journey' do
+
+		describe '#touch in' do
+
+			it 'should change the status of journey to true' do
+				oystercard.top_up(10)
+				expect {oystercard.touch_in}.to change {oystercard.journey}.from(false).to(true)
+			end  
+
+			it 'should raise an error if insufficient funds' do
+				expect {oystercard.touch_in}.to raise_error "Insufficient funds"
+			end 
+
+		end 
+
+		describe '#touch out' do
+
+			it 'should change the status of journey to false' do
+				oystercard.top_up(10)
+				oystercard.touch_in
+				expect {oystercard.touch_out}.to change {oystercard.journey}.from(true).to(false)
+			end
+
+		end 
+	end
 
 end
