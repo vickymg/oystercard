@@ -1,14 +1,14 @@
 class Oystercard
 
-  attr_reader :balance, :max_balance, :status
+  attr_reader :balance, :max_balance
 
   DEFAULT_BALANCE = 0
   MAX_BALANCE = 90
+  MIN_FARE = 1
 
   def initialize(balance=DEFAULT_BALANCE)
     @balance = balance
-    @max_balance = MAX_BALANCE
-    @status = :out_of_journey
+    @in_use = false
   end
 
 
@@ -23,15 +23,16 @@ class Oystercard
   end
 
   def touch_in
-    @status = :in_journey
+    fail "Not enough money on card!" if @balance < MIN_FARE
+    @in_use = true
   end
 
   def touch_out
-    @status = :out_of_journey
+    @in_use = false
   end
 
   def in_journey?
-    @status == :in_journey ? true : false
+    @in_use
   end
 
 private

@@ -4,7 +4,6 @@ describe Oystercard do
   subject(:oystercard) {described_class.new}
   let(:topup_amount) {5}
   let(:random_topup_amount) {rand(1..20)}
-  let(:too_large_topup) {91}
   let(:set_fare) {2}
 
   describe "#initialize" do
@@ -15,13 +14,9 @@ describe Oystercard do
       expect(oystercard.balance).to eq Oystercard::DEFAULT_BALANCE
     end
 
-    it {is_expected.to respond_to(:max_balance)}
-
-    it "has a max balance of 90" do
-      expect(oystercard.max_balance).to eq Oystercard::MAX_BALANCE
+    it "is not in use" do
+      expect(oystercard).not_to be_in_journey
     end
-
-    it {is_expected.to respond_to(:in_journey?)}
 
   end
 
@@ -40,7 +35,8 @@ describe Oystercard do
     context "top up with max balance" do
 
       it "raises error if max balance is exceeded" do
-        expect{oystercard.top_up(too_large_topup)}.to raise_error "Exceeded max balance of #{Oystercard::MAX_BALANCE}!"
+        oystercard.instance_variable_set("@balance", 1)
+        expect{oystercard.top_up(Oystercard::MAX_BALANCE)}.to raise_error "Exceeded max balance of #{Oystercard::MAX_BALANCE}!"
       end
 
     end
@@ -72,28 +68,24 @@ describe Oystercard do
     end
   end
 
-  describe "#touch in" do
+  describe "#touch_in" do
 
-    it "touches in and changes status to in_journey" do
-      expect(oystercard.touch_in).to eq :in_journey
+    it {is_expected.to respond_to(:in_journey?)}
+
+    it "touches in and changes status to in use" do
+      oystercard.instance_variable_set("@balance", 1)
+      expect(oystercard.touch_in).to eq true
     end
 
-    it "returns in_journey when touched in" do
-      oystercard.touch_in
-      expect(oystercard.status).to eq :in_journey
+    it "raises an error if balance is below minimum" do
+      expect{oystercard.touch_in}.to raise_error "Not enough money on card!"
     end
-
   end
 
-  describe "#touch out" do
+  describe "#touch_out" do
 
-    it "touches out and changes status to out_of_journey" do
-      expect(oystercard.touch_out).to eq :out_of_journey
-    end
-
-    it "returns out_of_journey when touched out" do
-      oystercard.touch_out
-      expect(oystercard.status).to eq :out_of_journey
+    it "touches out and changes status to not in use" do
+      expect(oystercard.touch_out).to eq false
     end
 
   end
@@ -101,18 +93,19 @@ describe Oystercard do
   describe "#in_journey?" do
 
     before do
+      oystercard.instance_variable_set("@balance", 1)
       oystercard.touch_in
     end
 
     it "returns true when touched in" do
-      expect(oystercard.in_journey?).to be true
+      expect(oystercard).to be_in_journey
     end
 
     it "returns false when touched out" do
       oystercard.touch_out
-      expect(oystercard.in_journey?).to be false
+      expect(oystercard).not_to be_in_journey
     end
 
-  end
+   end
 
 end

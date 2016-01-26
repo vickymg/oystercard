@@ -22,4 +22,9 @@ describe 'feature_test' do
     expect(card.deduct(fare)).to eq 18
   end
 
+  it 'stops user touching in if balance is less than minimum fare' do
+    card = Oystercard.new
+    expect{card.touch_in}.to raise_error "Not enough money on card!"
+  end
+
 end
