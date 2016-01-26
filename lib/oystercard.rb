@@ -17,17 +17,13 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(fare)
-    fail "Please top up your Oystercard" if top_up_needed?(fare)
-    @balance -= fare
-  end
-
   def touch_in
     fail "Not enough money on card!" if @balance < MIN_FARE
     @in_use = true
   end
 
   def touch_out
+    deduct(MIN_FARE)
     @in_use = false
   end
 
@@ -43,6 +39,11 @@ private
 
   def top_up_needed?(fare)
     @balance - fare < 0
+  end
+
+  def deduct(fare)
+    fail "Please top up your Oystercard" if top_up_needed?(fare)
+    @balance -= fare
   end
 
 end

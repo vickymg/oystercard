@@ -43,30 +43,26 @@ describe Oystercard do
 
   end
 
-  describe "#deduct(fare)" do
-
-    it{is_expected.to respond_to(:deduct).with(1).argument}
-
-    before do
-      oystercard.top_up(topup_amount)
-    end
-
-    it "Will deduct the fare from the oystercard balance" do
-      expect(oystercard.deduct(set_fare)).to eq oystercard.balance
-    end
-
-    context "Cannot have a negative balance" do
-
-      before do
-        2.times {oystercard.deduct(set_fare)}
-      end
-
-      it "Will raise error 'Please top up your Oystercard'" do
-        expect{oystercard.deduct(set_fare)}.to raise_error "Please top up your Oystercard"
-      end
-
-    end
-  end
+  # describe "#deduct(fare)" do
+  #
+  #
+  #   before do
+  #     oystercard.top_up(topup_amount)
+  #   end
+  #
+  #
+  #   context "Cannot have a negative balance" do
+  #
+  #     before do
+  #       2.times {oystercard.deduct(set_fare)}
+  #     end
+  #
+  #     it "Will raise error 'Please top up your Oystercard'" do
+  #       expect{oystercard.deduct(set_fare)}.to raise_error "Please top up your Oystercard"
+  #     end
+  #
+  #   end
+  # end
 
   describe "#touch_in" do
 
@@ -85,7 +81,14 @@ describe Oystercard do
   describe "#touch_out" do
 
     it "touches out and changes status to not in use" do
+      oystercard.instance_variable_set("@balance", 1)
       expect(oystercard.touch_out).to eq false
+    end
+
+    it 'deducts the fare from the balance' do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.instance_variable_set("@in_use", true)
+      expect{oystercard.touch_out}.to change{oystercard.balance}.by(-(Oystercard::MIN_FARE))
     end
 
   end
