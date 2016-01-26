@@ -1,7 +1,7 @@
 require 'oystercard'
 
-
 describe Oystercard do
+
 	let(:oystercard) { Oystercard.new }
 
 	it 'should have a balance of 0' do
@@ -10,13 +10,9 @@ describe Oystercard do
 
 	describe '#top_up' do
 
-	   	it {is_expected.to respond_to(:top_up).with(1).argument}
-
-	   	it 'should top up the balance' do
-	   		oystercard.top_up(10)
-	   		expect(oystercard.balance).to eq(10)
-	         #above could be written using .to change .by
-	   	end
+	   it 'should top up the balance' do
+	 		 expect{oystercard.top_up(10)}.to change {oystercard.balance}.by(10)
+	   end
 
 		it 'should raise an error if maximum balance exceeded' do
 			maximum_balance = Oystercard::MAXIMUM_BALANCE
@@ -26,37 +22,47 @@ describe Oystercard do
 	end
 
 
-	describe '#deduct money' do
-		it {is_expected.to respond_to(:deduct).with(1).argument}
-
-		it 'should deduct the balance' do
-			oystercard.deduct(10)
-			expect(oystercard.balance).to eq(-10)
-			#NBabove could be written using .to change .by
-		end
-	end
-
 	describe 'journey' do
+
+		let(:station) {double :station}
+
 		describe '#touch in' do
+
 			it 'should change the status of journey to true' do
 				oystercard.top_up(10)
-				expect {oystercard.touch_in}.to change {oystercard.journey}.from(false).to(true)
+        oystercard.touch_in(station)
+				expect(oystercard.in_journey?).to eq true 
 			end
 
 			it 'should raise an error if insufficient funds' do
-				expect {oystercard.touch_in}.to raise_error "Insufficient funds"
+				expect {oystercard.touch_in(station)}.to raise_error "Insufficient funds"
 			end
+
+			it 'should remember the name of the entry station' do
+				oystercard.top_up(10)
+				oystercard.touch_in(station)
+				expect(oystercard.entry_station).to eq station
+			end 
+
 		end
 
 		describe '#touch out' do
+
 			it 'should change the status of journey to false' do
 				oystercard.top_up(10)
-				oystercard.touch_in
-				expect {oystercard.touch_out}.to change {oystercard.journey}.from(true).to(false)
+				oystercard.touch_in(station)
+				expect {oystercard.touch_out}.to change {oystercard.in_journey?}.from(true).to(false)
 			end
+
 			it 'should deduct fare at end of journey (touch_out)' do
-				expect {oystercard.touch_out}.to change {oystercard.balance}.by(oystercard.deduct(1))
+				expect {oystercard.touch_out}.to change {oystercard.balance}.by(-Oystercard::MINIMUM_FARE)
 			end
+
+			it 'should should nillify the entry station' do
+				oystercard.top_up(10)
+				oystercard.touch_in(station)
+				expect {oystercard.touch_out}.to change {oystercard.entry_station}.to eq nil
+			end 
 		end
 	end
 end
