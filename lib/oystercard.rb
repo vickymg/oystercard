@@ -1,3 +1,4 @@
+require_relative 'station'
 
 class Oystercard
 
