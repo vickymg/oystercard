@@ -36,6 +36,16 @@ describe Oystercard do
 				expect(oystercard.journey.log.journeys.last.values).to include(nil)
 			end
 
+			context 'fares' do
+
+				it 'deducts the penalty fare on touch out when journey incomplete' do
+					oystercard.top_up(20)
+					oystercard.touch_in(station)
+					expect{oystercard.touch_in(station)}.to change(oystercard, :balance).by(-6)
+				end
+
+			end
+
 		end
 
 		describe '#touch out' do

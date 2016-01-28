@@ -25,6 +25,7 @@ class Oystercard
       @journey.end_journey(nil)
       set_log
       @journey.start_station(station)
+      deduct
     else
       @in_journey = true
       @journey.start_station(station)
@@ -36,14 +37,14 @@ class Oystercard
       @journey.start_station(nil)
       @journey.end_journey(exit_station)
       set_log
-      # deduct
+      deduct
     else
       @journey.end_journey(exit_station)
       @in_journey = false
       set_log
-      # deduct
+      deduct
     end
-    deduct
+
   end
 
   private

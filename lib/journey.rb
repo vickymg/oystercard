@@ -34,7 +34,7 @@ PENALTY_FARE = 6
   end
 
   def complete?
-    false if @log.journeys.last.values.include?(nil)
+    true unless @entry_station == nil || @exit_station == nil
   end
 
   def reset

@@ -15,7 +15,7 @@ subject(:journey) {Journey.new}
     expect(journey.end_journey(exit_station)).to eq exit_station
   end
 
-  describe 'journey charging' do
+  describe 'charging' do
 
     it 'should return a minimum fare' do
       journey.start_station(station)
