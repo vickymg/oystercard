@@ -26,15 +26,15 @@ PENALTY_FARE = 6
   end
 
   def fare
-    if @entry_station == nil || @exit_station == nil
-      @fare = PENALTY_FARE
-    else
+    if complete?
       @fare = Oystercard::MINIMUM_FARE
+    else
+      @fare = PENALTY_FARE
     end
   end
 
   def complete?
-    true
+    false if @log.journeys.last.values.include?(nil)
   end
 
   def reset

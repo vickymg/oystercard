@@ -36,12 +36,14 @@ class Oystercard
       @journey.start_station(nil)
       @journey.end_journey(exit_station)
       set_log
+      # deduct
     else
-      deduct(MINIMUM_FARE)
       @journey.end_journey(exit_station)
       @in_journey = false
       set_log
+      # deduct
     end
+    deduct
   end
 
   private
@@ -50,8 +52,9 @@ class Oystercard
     !!@in_journey
   end
 
-  def deduct(amount)
-  	@balance -= amount
+  def deduct
+    fare = @journey.fare
+  	@balance -= fare
   end
 
   def set_log

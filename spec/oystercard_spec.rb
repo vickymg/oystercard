@@ -30,23 +30,39 @@ describe Oystercard do
 			end
 
 			it 'should complete previous journey with nil when touch_in twice' do
-				oystercard.top_up(10)
+				oystercard.top_up(20)
 				oystercard.touch_in(station)
 				oystercard.touch_in(station)
 				expect(oystercard.journey.log.journeys.last.values).to include(nil)
 			end
-
 
 		end
 
 		describe '#touch out' do
 
-			it 'should complete journey with nil when touch_out without touch_in' do
-				oystercard.top_up(10)
-				oystercard.touch_out(exit_station)
-				expect(oystercard.journey.log.journeys.last.values).to include(nil)
-			end
+				it 'should complete journey with nil when touch_out without touch_in' do
+					oystercard.top_up(20)
+					oystercard.touch_out(exit_station)
+					expect(oystercard.journey.log.journeys.last.values).to include(nil)
+				end
+
+			context 'fares' do
+
+				before do
+					oystercard.top_up(20)
+				end
+
+				it 'deducts the minimum fare on touch out' do
+					oystercard.touch_in(station)
+					expect{oystercard.touch_out(exit_station)}.to change(oystercard, :balance).by(-1)
+				end
+
+				it 'deducts the penalty fare on touch out when journey incomplete' do
+					expect{oystercard.touch_out(station)}.to change(oystercard, :balance).by(-6)
+				end
 
 		end
+
+	end
 
 end
