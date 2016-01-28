@@ -33,7 +33,7 @@ describe Oystercard do
 				oystercard.top_up(10)
 				oystercard.touch_in(station)
 				oystercard.touch_in(station)
-				expect(oystercard.journey_history.last.values).to include(nil)
+				expect(oystercard.journey.log.journeys.last.values).to include(nil)
 			end
 
 
@@ -41,14 +41,10 @@ describe Oystercard do
 
 		describe '#touch out' do
 
-			xit 'holds the journey history' do
-			  expect(oystercard.journey_history).to include record_journey
-			end
-
 			it 'should complete journey with nil when touch_out without touch_in' do
 				oystercard.top_up(10)
 				oystercard.touch_out(exit_station)
-				expect(oystercard.journey_history.last.values).to include(nil)
+				expect(oystercard.journey.log.journeys.last.values).to include(nil)
 			end
 
 		end

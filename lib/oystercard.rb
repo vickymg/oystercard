@@ -3,7 +3,7 @@ require_relative 'journey'
 
 class Oystercard
 
-  attr_reader :balance, :record_journey, :in_journey
+  attr_reader :balance, :record_journey, :in_journey, :journey
 
   MAXIMUM_BALANCE = 90
   MINIMUM_FARE = 1
@@ -25,6 +25,7 @@ class Oystercard
     if in_journey?
       @record_journey[:exit_station] = nil
       set_log(@record_journey)
+      @record_journey[:entry_station] = station
     else
       @in_journey = true
       @journey.start_station(station)
@@ -35,6 +36,7 @@ class Oystercard
   def touch_out(exit_station)
     unless in_journey?
       @record_journey[:entry_station] = nil
+      @record_journey[:exit_station] = exit_station
       set_log(@record_journey)
     else
       deduct(MINIMUM_FARE)
