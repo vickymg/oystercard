@@ -29,12 +29,26 @@ describe Oystercard do
 				expect {oystercard.touch_in(station)}.to raise_error "Insufficient funds"
 			end
 
+			it 'should complete previous journey with nil when touch_in twice' do
+				oystercard.top_up(10)
+				oystercard.touch_in(station)
+				oystercard.touch_in(station)
+				expect(oystercard.journey_history.last.values).to include(nil)
+			end
+
+
 		end
 
 		describe '#touch out' do
 
 			xit 'holds the journey history' do
 			  expect(oystercard.journey_history).to include record_journey
+			end
+
+			it 'should complete journey with nil when touch_out without touch_in' do
+				oystercard.top_up(10)
+				oystercard.touch_out(exit_station)
+				expect(oystercard.journey_history.last.values).to include(nil)
 			end
 
 		end
