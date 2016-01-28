@@ -3,7 +3,7 @@ require_relative 'journey'
 
 class Oystercard
 
-  attr_reader :balance, :journey_history, :record_journey, :in_journey
+  attr_reader :balance, :record_journey, :in_journey
 
   MAXIMUM_BALANCE = 90
   MINIMUM_FARE = 1
@@ -13,7 +13,6 @@ class Oystercard
     @in_journey = false
     @journey = journey
     @record_journey = {}
-    @journey_history = []
   end
 
   def top_up(amount)
@@ -25,7 +24,7 @@ class Oystercard
   	raise "Insufficient funds" if @balance < MINIMUM_FARE
     if in_journey?
       @record_journey[:exit_station] = nil
-      set_journey_history
+      set_log(@record_journey)
     else
       @in_journey = true
       @journey.start_station(station)
@@ -36,13 +35,13 @@ class Oystercard
   def touch_out(exit_station)
     unless in_journey?
       @record_journey[:entry_station] = nil
-      set_journey_history
+      set_log(@record_journey)
     else
       deduct(MINIMUM_FARE)
       @journey.end_journey(exit_station)
       @in_journey = false
       @record_journey[:exit_station] = exit_station
-      set_journey_history
+      set_log(@record_journey)
     end
   end
 
@@ -56,8 +55,8 @@ class Oystercard
   	@balance -= amount
   end
 
-  def set_journey_history
-    @journey_history << record_journey.dup
+  def set_log(record_journey)
+    @journey.log.set_journey_history(record_journey)
     @record_journey = {}
   end
 

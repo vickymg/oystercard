@@ -1,8 +1,14 @@
+require_relative 'journey_log'
+
 class Journey
 
-attr_reader :entry_station, :exit_station, :fare
+attr_reader :entry_station, :exit_station, :fare, :log
 
 PENALTY_FARE = 6
+
+  def initialize(journey_klass = JourneyLog.new)
+    @log = journey_klass
+  end
 
   def start_station(station)
     @entry_station = station
