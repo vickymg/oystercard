@@ -18,6 +18,13 @@ PENALTY_FARE = 6
     @exit_station = exit_station
   end
 
+  def set_journey_history
+    current_journey = {}
+    current_journey[:entry_station] = @entry_station
+    current_journey[:exit_station] = @exit_station
+    @log.set_log(current_journey)
+  end
+
   def fare
     if @entry_station == nil || @exit_station == nil
       @fare = PENALTY_FARE
@@ -29,5 +36,12 @@ PENALTY_FARE = 6
   def complete?
     true
   end
+
+  def reset
+    start_station(nil)
+    end_journey(nil)
+  end
+
+
 
 end
