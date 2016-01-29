@@ -15,7 +15,7 @@ subject(:journey) {Journey.new}
     expect(journey.end_journey(exit_station)).to eq exit_station
   end
 
-  describe 'charging' do
+  describe '#fare' do
 
     it 'should return a minimum fare' do
       journey.start_station(station)
@@ -30,5 +30,18 @@ subject(:journey) {Journey.new}
 
   end
 
+  describe '#complete?' do
+
+    it 'should return true if journey complete' do
+      allow(journey).to receive(:complete?).and_return(true)
+      expect(journey.complete?).to eq true
+    end
+
+    it 'should return false if journey incomplete' do
+      allow(journey).to receive(:complete?).and_return(false)
+      expect(journey.complete?).to eq false
+    end
+
+  end
 
 end

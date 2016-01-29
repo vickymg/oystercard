@@ -71,8 +71,8 @@ describe Oystercard do
 					expect{oystercard.touch_out(station)}.to change(oystercard, :balance).by(-6)
 				end
 
-		end
+			end
 
-	end
+		end
 
 end
