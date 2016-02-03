@@ -4,8 +4,9 @@ describe Oystercard do
   subject(:oystercard) {described_class.new}
   let(:topup_amount) {5}
   let(:random_topup_amount) {rand(1..20)}
-  let(:too_large_topup) {91}
   let(:set_fare) {2}
+  let(:station) {double :station}
+  let(:exit_station) {double :exit_station}
 
   describe "#initialize" do
 
@@ -15,13 +16,13 @@ describe Oystercard do
       expect(oystercard.balance).to eq Oystercard::DEFAULT_BALANCE
     end
 
-    it {is_expected.to respond_to(:max_balance)}
-
-    it "has a max balance of 90" do
-      expect(oystercard.max_balance).to eq Oystercard::MAX_BALANCE
+    it "is not in use" do
+      expect(oystercard).not_to be_in_journey
     end
 
-    it {is_expected.to respond_to(:in_journey?)}
+    it 'has en empty journey list by default' do
+      expect(oystercard.journey_list).to be_empty
+    end
 
   end
 
@@ -40,60 +41,76 @@ describe Oystercard do
     context "top up with max balance" do
 
       it "raises error if max balance is exceeded" do
-        expect{oystercard.top_up(too_large_topup)}.to raise_error "Exceeded max balance of #{Oystercard::MAX_BALANCE}!"
+        oystercard.instance_variable_set("@balance", 1)
+        expect{oystercard.top_up(Oystercard::MAX_BALANCE)}.to raise_error "Exceeded max balance of #{Oystercard::MAX_BALANCE}!"
       end
 
     end
 
   end
 
-  describe "#deduct(fare)" do
+  # describe "#deduct(fare)" do
+  #
+  #
+  #   before do
+  #     oystercard.top_up(topup_amount)
+  #   end
+  #
+  #
+  #   context "Cannot have a negative balance" do
+  #
+  #     before do
+  #       2.times {oystercard.deduct(set_fare)}
+  #     end
+  #
+  #     it "Will raise error 'Please top up your Oystercard'" do
+  #       expect{oystercard.deduct(set_fare)}.to raise_error "Please top up your Oystercard"
+  #     end
+  #
+  #   end
+  # end
 
-    it{is_expected.to respond_to(:deduct).with(1).argument}
+  describe "#touch_in" do
 
-    before do
-      oystercard.top_up(topup_amount)
+    it {is_expected.to respond_to(:in_journey?)}
+
+    it "touches in and changes status to in use" do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.touch_in(station)
+      expect(oystercard).to be_in_journey
     end
 
-    it "Will deduct the fare from the oystercard balance" do
-      expect(oystercard.deduct(set_fare)).to eq oystercard.balance
+    it "raises an error if balance is below minimum" do
+      expect{oystercard.touch_in(station)}.to raise_error "Not enough money on card!"
     end
 
-    context "Cannot have a negative balance" do
-
-      before do
-        2.times {oystercard.deduct(set_fare)}
-      end
-
-      it "Will raise error 'Please top up your Oystercard'" do
-        expect{oystercard.deduct(set_fare)}.to raise_error "Please top up your Oystercard"
-      end
-
+    it 'remembers the entry station' do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.touch_in(station)
+      expect(oystercard.entry_station).to eq station
     end
+
   end
 
-  describe "#touch in" do
+  describe "#touch_out" do
 
-    it "touches in and changes status to in_journey" do
-      expect(oystercard.touch_in).to eq :in_journey
+    it "touches out and changes status to not in use" do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.touch_out(exit_station)
+      expect(oystercard).not_to be_in_journey
     end
 
-    it "returns in_journey when touched in" do
-      oystercard.touch_in
-      expect(oystercard.status).to eq :in_journey
+    it 'deducts the fare from the balance' do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.instance_variable_set("@in_use", true)
+      expect{oystercard.touch_out(exit_station)}.to change{oystercard.balance}.by(-(Oystercard::MIN_FARE))
     end
 
-  end
-
-  describe "#touch out" do
-
-    it "touches out and changes status to out_of_journey" do
-      expect(oystercard.touch_out).to eq :out_of_journey
-    end
-
-    it "returns out_of_journey when touched out" do
-      oystercard.touch_out
-      expect(oystercard.status).to eq :out_of_journey
+    it "forgets the entry station on touch-out" do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.instance_variable_set("@entry_station", station)
+      oystercard.touch_out(exit_station)
+      expect(oystercard.entry_station).to eq nil
     end
 
   end
@@ -101,16 +118,28 @@ describe Oystercard do
   describe "#in_journey?" do
 
     before do
-      oystercard.touch_in
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.touch_in(station)
     end
 
     it "returns true when touched in" do
-      expect(oystercard.in_journey?).to be true
+      expect(oystercard).to be_in_journey
     end
 
     it "returns false when touched out" do
-      oystercard.touch_out
-      expect(oystercard.in_journey?).to be false
+      oystercard.touch_out(exit_station)
+      expect(oystercard).not_to be_in_journey
+    end
+
+   end
+
+  describe 'journey history' do
+
+    it 'remembers a list of journeys' do
+      oystercard.instance_variable_set("@balance", 1)
+      oystercard.touch_in(station)
+      oystercard.touch_out(exit_station)
+      expect(oystercard.journey_list).to include(station => exit_station)
     end
 
   end

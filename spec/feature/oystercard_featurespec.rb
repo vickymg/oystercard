@@ -1,6 +1,9 @@
 require 'oystercard'
 
 describe 'feature_test' do
+
+  station = "station"
+
   it 'Tops up oystercard' do
     card = Oystercard.new
     amount = 20
@@ -14,12 +17,37 @@ describe 'feature_test' do
     expect{card.top_up(amount)}.to raise_error("Exceeded max balance of #{Oystercard::MAX_BALANCE}!")
   end
 
-  it 'deducts money from oystercard' do
+
+  it 'stops user touching in if balance is less than minimum fare' do
     card = Oystercard.new
-    amount = 20
-    fare = 2
-    card.top_up(amount)
-    expect(card.deduct(fare)).to eq 18
+    expect{card.touch_in(station)}.to raise_error "Not enough money on card!"
+  end
+
+  it 'deducts the fare for the journey on touch-out' do
+    oyster = Oystercard.new
+    oyster.top_up(20)
+    oyster.touch_in(station)
+    expect {oyster.touch_out}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+  end
+
+  it 'remembers the entry station' do
+    oyster = Oystercard.new(20)
+    oyster.touch_in(station)
+    expect(oyster.entry_station).to eq station
+  end
+
+  it 'forgets the entry station on touch out' do
+    oyster = Oystercard.new(20)
+    oyster.touch_in(station)
+    oyster.touch_out
+    expect(oyster.entry_station).to eq nil
+  end
+
+  it 'remembers a list of journeys' do
+    card =  Oystercard.new(5)
+    card.touch_in("Station1")
+    card.touch_out('Station2')
+    expect(card.journey_list).to include("Station1").and include("Station2")
   end
 
 end
