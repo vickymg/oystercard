@@ -1,8 +1,16 @@
+require_relative 'journey_log'
+
 class Journey
 
-attr_reader :entry_station, :exit_station, :fare
+attr_reader :entry_station, :exit_station, :fare, :log
 
-  def initialize(station = nil)
+PENALTY_FARE = 6
+
+  def initialize(journey_klass = JourneyLog.new)
+    @log = journey_klass
+  end
+
+  def start_station(station)
     @entry_station = station
   end
 
@@ -10,16 +18,30 @@ attr_reader :entry_station, :exit_station, :fare
     @exit_station = exit_station
   end
 
+  def set_journey_history
+    current_journey = {}
+    current_journey[:entry_station] = @entry_station
+    current_journey[:exit_station] = @exit_station
+    @log.set_log(current_journey)
+  end
+
   def fare
-    if @entry_station == nil || @exit_station == nil
-      @fare = 6
-    else
+    if complete?
       @fare = Oystercard::MINIMUM_FARE
+    else
+      @fare = PENALTY_FARE
     end
   end
 
   def complete?
-    true
+    true unless @entry_station == nil || @exit_station == nil
   end
+
+  def reset
+    start_station(nil)
+    end_journey(nil)
+  end
+
+
 
 end

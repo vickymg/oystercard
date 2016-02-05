@@ -4,10 +4,10 @@ describe Journey do
 
 let(:station) {double :station, zone: 1}
 let(:exit_station) {double :station, zone: 2}
-subject(:journey) {Journey.new(station)}
+subject(:journey) {Journey.new}
 
   it 'should have a entry station' do
-    expect(journey.entry_station).to eq station
+    expect(journey.start_station(station)).to eq station
   end
 
 
@@ -15,16 +15,31 @@ subject(:journey) {Journey.new(station)}
     expect(journey.end_journey(exit_station)).to eq exit_station
   end
 
-  describe 'journey charging' do
+  describe '#fare' do
 
     it 'should return a minimum fare' do
+      journey.start_station(station)
       journey.end_journey(exit_station)
       expect(journey.fare).to eq Oystercard::MINIMUM_FARE
     end
 
     it 'should return a penalty fare' do
-      incomplete_journey = Journey.new
-      expect(incomplete_journey.fare).to eq 6
+      journey.start_station(station)
+      expect(journey.fare).to eq Journey::PENALTY_FARE
+    end
+
+  end
+
+  describe '#complete?' do
+
+    it 'should return true if journey complete' do
+      allow(journey).to receive(:complete?).and_return(true)
+      expect(journey.complete?).to eq true
+    end
+
+    it 'should return false if journey incomplete' do
+      allow(journey).to receive(:complete?).and_return(false)
+      expect(journey.complete?).to eq false
     end
 
   end
