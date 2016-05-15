@@ -1,15 +1,15 @@
 require 'station'
 
-describe Station do 
+describe Station do
 
-  subject(:station) {Station.new(:name, :zone)}
+  subject(:station) { described_class.new('Angel', 'zone: 1') }
 
-    describe '#initialisation' do
+  it 'should have a name on creation' do
+    expect(subject.name).to eq('Angel')
+  end
 
-      describe 'what zone a station is in' do
-        it 'should tell you what zone a station is in' do
-          expect(station).to have_attributes(:name => :name, :zone => :zone)
-        end 
-      end 
-    end 
-  end 	
+  it 'should have a zone on creation' do
+    expect(subject.zone).to eq('zone: 1')
+  end
+
+end

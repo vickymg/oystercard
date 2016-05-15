@@ -1,25 +1,40 @@
 class Journey
 
-attr_reader :entry_station, :exit_station, :fare
+  attr_reader :entry_station, :exit_station
 
-  def initialize(station = nil)
-    @entry_station = station
+  PENALTY_FARE = 6
+
+  def initialize
+    @complete = false
   end
 
-  def end_journey(exit_station = nil)
+  def start(entry_station = nil)
+    @entry_station = entry_station
+  end
+
+  def finish(exit_station = nil)
     @exit_station = exit_station
+    @complete = true
+    fare
+    self
   end
 
   def fare
-    if @entry_station == nil || @exit_station == nil
-      @fare = 6
+    if penalty?
+      @fare = PENALTY_FARE
     else
-      @fare = Oystercard::MINIMUM_FARE
+      @fare = Oystercard::MIN_FARE
     end
   end
 
   def complete?
-    true
+    @complete
+  end
+
+  private
+
+  def penalty?
+    (!entry_station || !exit_station)
   end
 
 end
